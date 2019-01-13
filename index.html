@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--To run this example from a clone of the repository, run `yarn start`
+    in the root KaTeX directory and then visit with your web browser:
+    http://localhost:7936/contrib/copy-tex/index.html
+  -->
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Copy-tex test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.css" integrity="sha384-xNwWFq3SIvM4dq/1RUyWumk8nj/0KFg4TOnNcfzUU4X2gNn3WoRML69gO7waf3xh" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.js" integrity="sha384-UP7zD+aGyuDvxWQEDSRYcvoTxJSD82C6VvuEBktJZGo25CVhDstY9sCDHvyceo9L" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+    <script src="dist/katex-copytex.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="dist/katex-copytex.css">
+    <style type="text/css">
+      body {
+          margin: 0px;
+          padding: 0px;
+          font-size: 36px;
+      }
+
+      #test > .blue {
+          color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Copy-tex test</h1>
+    <h2>Try copy/pasting some of the text below!</h2>
+    <p>
+    Here is some \(\KaTeX\) math: $$ x^2+y^2=z^2 $$
+    The variables are \(x\), \(y\), and \(z\),
+    which are all in \(\mathbb{R}^+\).
+    Q.E.D.
+    </p>
+  </body>
+</html>
