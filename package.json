@@ -1,8 +1,8 @@
 {
   "name": "katex-copytex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Copy KaTeX math as TeX commands",
-  "main": "src/copy-tex.js",
+  "main": "src/katex-copytex.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode production",
