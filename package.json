@@ -1,6 +1,6 @@
 {
   "name": "katex-copytex",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Copy KaTeX math as TeX commands",
   "main": "src/katex-copytex.js",
   "scripts": {
