@@ -9,8 +9,17 @@ export const defaultCopyDelimiters = {
 // as in copy-tex.js.
 export const katexReplaceWithTex = function (fragment,
     copyDelimiters = defaultCopyDelimiters) {
-    let tex = '';
-
+    // Remove .katex-html blocks that are preceded by .katex-mathml blocks
+    // (which will get replaced below).
+    const katexHtml = fragment.querySelectorAll('.katex-mathml + .katex-html');
+    for (let i = 0; i < katexHtml.length; i++) {
+        const element = katexHtml[i];
+        if (element.remove) {
+            element.remove(null);
+        } else {
+            element.parentNode.removeChild(element);
+        }
+    }
     // Replace .katex-mathml elements with their annotation (TeX source)
     // descendant, with inline delimiters.
     const katexMathml = fragment.querySelectorAll('.katex-mathml');
@@ -18,21 +27,26 @@ export const katexReplaceWithTex = function (fragment,
         const element = katexMathml[i];
         const texSource = element.querySelector('annotation');
         if (texSource) {
-            tex = copyDelimiters.inline[0] +
-                texSource.innerHTML + copyDelimiters.inline[1];
+            if (element.replaceWith) {
+                element.replaceWith(texSource);
+            } else {
+                element.parentNode.replaceChild(texSource, element);
+            }
+            texSource.innerHTML = copyDelimiters.inline[0] +
+                texSource.innerHTML.trim() + copyDelimiters.inline[1];
         }
     }
     // Switch display math to display delimiters.
     const displays = fragment.querySelectorAll('.katex-display annotation');
     for (let i = 0; i < displays.length; i++) {
         const element = displays[i];
-        tex = copyDelimiters.display[0] + '\n' +
+        element.innerHTML = copyDelimiters.display[0] + '\n' +
             element.innerHTML.substr(copyDelimiters.inline[0].length,
                 element.innerHTML.length - copyDelimiters.inline[0].length -
-                copyDelimiters.inline[1].length) + '\n' +
-            copyDelimiters.display[1];
+                copyDelimiters.inline[1].length) +
+            '\n' + copyDelimiters.display[1];
     }
-    return tex;
+    return fragment;
 };
 
 export default katexReplaceWithTex;

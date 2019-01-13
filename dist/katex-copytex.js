@@ -107,20 +107,7 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _katex2tex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./katex2tex */ "./src/katex2tex.js");
-
-
-function hasSomeParentTheClass(element, classname) {
-  if (element.className && element.className.split(' ').indexOf(classname) >= 0) {
-    return true;
-  }
-
-  if (!element.parentNode) {
-    return false;
-  }
-
-  return element.parentNode && hasSomeParentTheClass(element.parentNode, classname);
-} // Global copy handler to modify behavior on .katex elements.
-
+ // Global copy handler to modify behavior on .katex elements.
 
 document.addEventListener('copy', function (event) {
   const selection = window.getSelection();
@@ -129,9 +116,7 @@ document.addEventListener('copy', function (event) {
     return; // default action OK if selection is empty
   }
 
-  const parentEl = selection.getRangeAt(0).startContainer;
-  const isBlock = hasSomeParentTheClass(parentEl, 'katex-display');
-  const fragment = isBlock ? selection.getRangeAt(0).commonAncestorContainer : parentEl; // return;
+  const fragment = selection.getRangeAt(0).cloneContents();
 
   if (!fragment.querySelector('.katex-mathml')) {
     return; // default action OK if no .katex-mathml elements
@@ -146,7 +131,7 @@ document.addEventListener('copy', function (event) {
 
   event.clipboardData.setData('text/html', html.join('')); // Rewrite plain-text version.
 
-  event.clipboardData.setData('text/plain', Object(_katex2tex__WEBPACK_IMPORTED_MODULE_0__["default"])(fragment)); // Prevent normal copy handling.
+  event.clipboardData.setData('text/plain', Object(_katex2tex__WEBPACK_IMPORTED_MODULE_0__["default"])(fragment).textContent); // Prevent normal copy handling.
 
   event.preventDefault();
 });
@@ -196,8 +181,21 @@ const defaultCopyDelimiters = {
 // as in copy-tex.js.
 
 const katexReplaceWithTex = function (fragment, copyDelimiters = defaultCopyDelimiters) {
-  let tex = ''; // Replace .katex-mathml elements with their annotation (TeX source)
+  // Remove .katex-html blocks that are preceded by .katex-mathml blocks
+  // (which will get replaced below).
+  const katexHtml = fragment.querySelectorAll('.katex-mathml + .katex-html');
+
+  for (let i = 0; i < katexHtml.length; i++) {
+    const element = katexHtml[i];
+
+    if (element.remove) {
+      element.remove(null);
+    } else {
+      element.parentNode.removeChild(element);
+    }
+  } // Replace .katex-mathml elements with their annotation (TeX source)
   // descendant, with inline delimiters.
+
 
   const katexMathml = fragment.querySelectorAll('.katex-mathml');
 
@@ -206,7 +204,13 @@ const katexReplaceWithTex = function (fragment, copyDelimiters = defaultCopyDeli
     const texSource = element.querySelector('annotation');
 
     if (texSource) {
-      tex = copyDelimiters.inline[0] + texSource.innerHTML + copyDelimiters.inline[1];
+      if (element.replaceWith) {
+        element.replaceWith(texSource);
+      } else {
+        element.parentNode.replaceChild(texSource, element);
+      }
+
+      texSource.innerHTML = copyDelimiters.inline[0] + texSource.innerHTML.trim() + copyDelimiters.inline[1];
     }
   } // Switch display math to display delimiters.
 
@@ -215,10 +219,10 @@ const katexReplaceWithTex = function (fragment, copyDelimiters = defaultCopyDeli
 
   for (let i = 0; i < displays.length; i++) {
     const element = displays[i];
-    tex = copyDelimiters.display[0] + '\n' + element.innerHTML.substr(copyDelimiters.inline[0].length, element.innerHTML.length - copyDelimiters.inline[0].length - copyDelimiters.inline[1].length) + '\n' + copyDelimiters.display[1];
+    element.innerHTML = copyDelimiters.display[0] + '\n' + element.innerHTML.substr(copyDelimiters.inline[0].length, element.innerHTML.length - copyDelimiters.inline[0].length - copyDelimiters.inline[1].length) + '\n' + copyDelimiters.display[1];
   }
 
-  return tex;
+  return fragment;
 };
 /* harmony default export */ __webpack_exports__["default"] = (katexReplaceWithTex);
 
